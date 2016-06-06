@@ -1,6 +1,12 @@
 package edu.scu.sgoyal.youtour;
 
+import android.util.Log;
+
 import com.estimote.sdk.Region;
+import com.firebase.client.ChildEventListener;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,9 +43,55 @@ public class Utility {
         return tourStatus;
     }
 
-    public static ArrayList<Destination> configureDestination() {
-        ArrayList<Destination> destinations = new ArrayList<Destination>();
+    public static ArrayList<Destination> configureDestinatiosFirebase()
+    {
 
+        final ArrayList<Destination> destinationArrayList = new ArrayList<>();
+        MapsActivity.ref.addChildEventListener(new ChildEventListener() {
+
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s)
+            {
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s)
+            {
+                ArrayList<Destination> tempDestinations = (ArrayList<Destination>) dataSnapshot.getValue();
+                for(Destination d : tempDestinations)
+                {
+                    destinationArrayList.add(d);
+                    Log.i("Destination", d.getName());
+                }
+
+            }
+
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot)
+            {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s)
+            {
+
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError)
+            {
+
+            }
+        });
+
+        return destinationArrayList;
+    }
+    public static ArrayList<Destination> configureDestination() {
+
+        ArrayList<Destination> destinations = new ArrayList<Destination>();
 
         Destination d ;
         destinations = new ArrayList<>();
@@ -58,14 +110,14 @@ public class Utility {
                         11837, 15433)));
         destinations.add(new Destination("Church", "ElRLtIus6xk", "Historic Mission Santa Clara is a beautiful icon that sits at the center of our campus.  First established in 1777, the Franciscan Order handed the Mission over to the Society of Jesus (the Jesuits) in 1851, who then started Santa Clara College, the first institution of higher education in California. " +
                 "Today, the Mission serves as the student chapel for Santa Clara Universtiy.", "church.jpg", 37.349284, -121.941061,
-//                new Region(
-//                        "Chruch Beacon",
-//                        UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"),
-//                        47753, 22035)));
                 new Region(
-                        "Church Beacon",
-                        UUID.fromString("8492E75F-4FD6-469D-B132-043FE94921D8"),
-                        1862, 3289)));
+                        "Chruch Beacon",
+                        UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"),
+                        47753, 22035)));
+//                new Region(
+//                        "Church Beacon",
+//                        UUID.fromString("8492E75F-4FD6-469D-B132-043FE94921D8"),
+//                        1862, 3289)));
         destinations.add(new Destination("Museum", "fekk_11n4Zw", "The de Saisset Museum houses an extensive collection numbering more than 12,000 objects. The museum's Art collection includes painting and sculpture, works on paper and photography, new media, and decorative arts. The History collection is divided into two main areas: California History and Mission-era liturgical vestments. Since its founding in 1955, the museum has developed large and encyclopedic holdings, covering a wide range of art historical periods and styles. Although the museum is committed to caring for every piece in its collection," +
                 "current collecting activity is predominantly focused on works by contemporary California artists.", "museum.jpg", 37.349989, -121.940611));
         destinations.add(new Destination("Solar house", "RZP1ljoQLDA", "Radiant House is a 980 square-foot, net-zero energy home designed and constructed by Santa Clara University students from January 2012 through August, 2013, to compete in the Solar Decathalon.", "solar.jpg", 37.347774, -121.939269));

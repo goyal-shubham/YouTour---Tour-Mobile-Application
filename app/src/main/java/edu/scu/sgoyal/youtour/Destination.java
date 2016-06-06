@@ -2,6 +2,7 @@ package edu.scu.sgoyal.youtour;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import com.estimote.sdk.Beacon;
 import com.estimote.sdk.Region;
@@ -94,10 +95,15 @@ public class Destination implements Parcelable{
 
             //TODO configure destinations by querying database
 
-            destinations = Utility.configureDestination();
+            destinations = Utility.configureDestinatiosFirebase();
 
-
+            if(destinations.size() == 0)
+            {
+                destinations = Utility.configureDestination();
+                Log.i("Destination" , "From utility");
+            }
         }
+
         return destinations;
     }
 

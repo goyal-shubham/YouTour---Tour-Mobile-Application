@@ -21,6 +21,7 @@ import com.estimote.sdk.Beacon;
 import com.estimote.sdk.BeaconManager;
 import com.estimote.sdk.Region;
 import com.estimote.sdk.SystemRequirementsChecker;
+import com.firebase.client.Firebase;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -49,6 +50,7 @@ public class MapsActivity extends MenuActivity implements OnMapReadyCallback {
     private static BeaconManager beaconManager;
     private static Context appContext ;
 
+    public static Firebase ref;
     private static BeaconManager getBeaconManager() {
         if(beaconManager == null){
             beaconManager = new BeaconManager(appContext);
@@ -71,6 +73,10 @@ public class MapsActivity extends MenuActivity implements OnMapReadyCallback {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 //        BeaconManager bm = MapsActivity.getBeaconManager();
+
+        Firebase.setAndroidContext(this);
+        ref = new Firebase("https://youtourtest.firebaseio.com/");
+
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -281,7 +287,7 @@ public class MapsActivity extends MenuActivity implements OnMapReadyCallback {
 //        System.out.println(gmmIntentUri);
 //        currentPosition++;
         Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-        mapIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+        mapIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED );
         mapIntent.putExtra("DESTINATION",d);
         mapIntent.setPackage("com.google.android.apps.maps");
         startActivity(mapIntent);
