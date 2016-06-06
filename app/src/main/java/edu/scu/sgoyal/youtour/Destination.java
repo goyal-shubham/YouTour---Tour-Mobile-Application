@@ -2,18 +2,17 @@ package edu.scu.sgoyal.youtour;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
-import com.estimote.sdk.Beacon;
 import com.estimote.sdk.Region;
 import com.google.android.gms.maps.model.LatLng;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by raggupta on 2016-05-23.
  */
-public class Destination implements Parcelable{
+public class Destination implements Parcelable {
 
     private static ArrayList<Destination> destinations;
     private String name;
@@ -23,20 +22,40 @@ public class Destination implements Parcelable{
     private LatLng latLng;
     private double lat;
     private double lng;
-    private Beacon beacon;
     private Region region;
+    private String regionTitle;
+    private String UUID;
+    private int becaonMinor;
+    private int beaconMajor;
+    private ArrayList<Double> ratings;
+    private ArrayList<String> comments;
 
-    public Destination(String name, String youtube_url, String description, String image, double lat, double lng) {
+
+    public Destination() {
+
+    }
+
+    public Destination(String name, String youtube_url, String description, String image,
+                       double lat, double lng, String regionTitle, String UUID, int becaonMinor,
+                       int beaconMajor, ArrayList<Double> ratings, ArrayList<String> comments) {
         this.name = name;
         this.youtube_url = youtube_url;
         this.description = description;
         this.image = image;
         this.lat = lat;
         this.lng = lng;
-        this.latLng = new LatLng(lat, lng);
+        this.regionTitle = regionTitle;
+        this.UUID = UUID;
+        this.becaonMinor = becaonMinor;
+        this.beaconMajor = beaconMajor;
+        this.ratings = ratings;
+        this.comments = comments;
     }
 
-    public Destination(String name, String youtube_url, String description, String image, double lat, double lng, Region region) {
+
+
+    public Destination(String name, String youtube_url, String description, String image,
+                       double lat, double lng, Region region) {
         this.name = name;
         this.youtube_url = youtube_url;
         this.description = description;
@@ -47,20 +66,7 @@ public class Destination implements Parcelable{
         this.region = region;
     }
 
-    public Destination(String name, String youtube_url, String description, String image, double lat, double lng, Beacon beacon, Region region) {
-        this.name = name;
-        this.youtube_url = youtube_url;
-        this.description = description;
-        this.image = image;
-        this.lat = lat;
-        this.lng = lng;
-        this.latLng = new LatLng(lat, lng);
-        this.beacon = beacon;
-        this.region = region;
-
-    }
-
-    protected Destination(Parcel in)
+   protected Destination(Parcel in)
     {
         name = in.readString();
         youtube_url = in.readString();
@@ -69,21 +75,18 @@ public class Destination implements Parcelable{
         latLng = in.readParcelable(LatLng.class.getClassLoader());
         lat = in.readDouble();
         lng = in.readDouble();
-        beacon = in.readParcelable(Beacon.class.getClassLoader());
         region = in.readParcelable(Region.class.getClassLoader());
     }
 
-    public static final Creator<Destination> CREATOR = new Creator<Destination>()
-    {
+
+    public static final Creator<Destination> CREATOR = new Creator<Destination>() {
         @Override
-        public Destination createFromParcel(Parcel in)
-        {
+        public Destination createFromParcel(Parcel in) {
             return new Destination(in);
         }
 
         @Override
-        public Destination[] newArray(int size)
-        {
+        public Destination[] newArray(int size) {
             return new Destination[size];
         }
     };
@@ -94,8 +97,8 @@ public class Destination implements Parcelable{
 
             //TODO configure destinations by querying database
 
-            destinations = Utility.configureDestination();
-
+//            destinations = Utility.configureDestination();
+            destinations = MapsActivity.dbDataDestinatios;
 
         }
         return destinations;
@@ -105,6 +108,57 @@ public class Destination implements Parcelable{
         this.destinations = destinations;
     }
 
+    public String getRegionTitle() {
+        return regionTitle;
+    }
+
+    public void setRegionTitle(String regionTitle) {
+        this.regionTitle = regionTitle;
+    }
+
+    public String getUUID() {
+        return UUID;
+    }
+
+    public void setUUID(String UUID) {
+        this.UUID = UUID;
+    }
+
+    public int getBecaonMinor() {
+        return becaonMinor;
+    }
+
+    public void setBecaonMinor(int becaonMinor) {
+        this.becaonMinor = becaonMinor;
+    }
+
+    public int getBeaconMajor() {
+        return beaconMajor;
+    }
+
+    public void setBeaconMajor(int beaconMajor) {
+        this.beaconMajor = beaconMajor;
+    }
+
+    public ArrayList<Double> getRatings() {
+        return ratings;
+    }
+
+    public void setRatings(ArrayList<Double> ratings) {
+        this.ratings = ratings;
+    }
+
+    public ArrayList<String> getComments() {
+        if(comments == null)
+        {
+            comments = new ArrayList<String>();
+        }
+        return comments;
+    }
+
+    public void setComments(ArrayList<String> comments) {
+        this.comments = comments;
+    }
 
     public double getLat() {
         return lat;
@@ -122,14 +176,6 @@ public class Destination implements Parcelable{
         this.lng = lng;
     }
 
-    public Beacon getBeacon() {
-        return beacon;
-    }
-
-    public void setBeacon(Beacon beacon) {
-        this.beacon = beacon;
-    }
-
     public String getName() {
         return name;
     }
@@ -144,6 +190,14 @@ public class Destination implements Parcelable{
 
     public void setLatLng(LatLng latLng) {
         this.latLng = latLng;
+    }
+
+    public void setLatLng() {
+        this.latLng = new LatLng(this.getLat(),this.getLng());
+    }
+
+    public void setLatLng(double lat, double lng) {
+        this.latLng = new LatLng(lat,lng);
     }
 
     public String getYoutube_url() {
@@ -178,25 +232,19 @@ public class Destination implements Parcelable{
         this.region = region;
     }
 
-    @Override
-    public int describeContents()
-    {
-        return 0;
+    public void setRegion(String regionTitle, String UUID, int beaconMajor, int becaonMinor) {
+        Log.i("Setting Region" ,"Setting REgiom ==================");
+        this.region = new Region(regionTitle, java.util.UUID.fromString(UUID), beaconMajor, becaonMinor);
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags)
-    {
-        dest.writeString(name);
-        dest.writeString(youtube_url);
-        dest.writeString(description);
-        dest.writeString(image);
-        dest.writeParcelable(latLng, flags);
-        dest.writeDouble(lat);
-        dest.writeDouble(lng);
-        dest.writeParcelable(beacon, flags);
-        dest.writeParcelable(region, flags);
+    public void setRegion() {
+        this.region = new Region(this.regionTitle, java.util.UUID.fromString(this.UUID), this.beaconMajor, this.becaonMinor);
     }
+
+
+
+
+
 
     public static Destination getDestinationBasedOnName(String s) {
         for (Destination d : Destination.getDestinations()) {
@@ -223,5 +271,27 @@ public class Destination implements Parcelable{
             }
         }
         return null;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeString(youtube_url);
+        dest.writeString(description);
+        dest.writeString(image);
+        dest.writeParcelable(latLng, flags);
+        dest.writeDouble(lat);
+        dest.writeDouble(lng);
+        dest.writeParcelable(region, flags);
+        dest.writeString(regionTitle);
+        dest.writeString(UUID);
+        dest.writeLong(becaonMinor);
+        dest.writeLong(beaconMajor);
+        dest.writeStringList(comments);
     }
 }
